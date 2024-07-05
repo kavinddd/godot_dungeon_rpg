@@ -1,0 +1,31 @@
+[gd_scene load_steps=8 format=3 uid="uid://byh87ktmknao8"]
+
+[ext_resource type="PackedScene" uid="uid://tspg7ckhj4ja" path="res://Assets/Models/Dungeon/gltf/floor_tile_small.gltf.glb" id="1_sax3w"]
+[ext_resource type="PackedScene" uid="uid://65y5xefldhlu" path="res://Assets/Models/Dungeon/gltf/wall.gltf.glb" id="2_ssr0v"]
+[ext_resource type="PackedScene" uid="uid://boeb80pmvvqi6" path="res://Assets/Models/Dungeon/gltf/stairs_wood_decorated.gltf.glb" id="3_yk231"]
+[ext_resource type="PackedScene" uid="uid://uadoor04b3oo" path="res://Assets/Models/Dungeon/gltf/wall_corner.gltf.glb" id="4_8adk5"]
+[ext_resource type="PackedScene" uid="uid://xoou10wfjnjj" path="res://Assets/Models/Dungeon/gltf/wall_doorway_Tsplit.gltf.glb" id="5_i6fwo"]
+[ext_resource type="PackedScene" uid="uid://c8vnfrtuh1jjq" path="res://Assets/Models/Dungeon/gltf/wall_open_scaffold.gltf.glb" id="6_f2m78"]
+[ext_resource type="PackedScene" uid="uid://dhg1kuova467b" path="res://Assets/Models/Dungeon/gltf/wall_doorway_scaffold.glb" id="7_6kqy7"]
+
+[node name="Tiles" type="Node3D"]
+
+[node name="floor_tile_small_gltf" parent="." instance=ExtResource("1_sax3w")]
+
+[node name="wall_gltf" parent="." instance=ExtResource("2_ssr0v")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.50892, 0, 0)
+
+[node name="stairs_wood_decorated_gltf" parent="." instance=ExtResource("3_yk231")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.52179, 0, 0)
+
+[node name="wall_corner_gltf" parent="." instance=ExtResource("4_8adk5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.39597, 0, 0)
+
+[node name="wall_doorway_Tsplit_gltf" parent="." instance=ExtResource("5_i6fwo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.4832, 0, 0)
+
+[node name="wall_open_scaffold_gltf" parent="." instance=ExtResource("6_f2m78")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.4517, 0, 0)
+
+[node name="wall_doorway_scaffold2" parent="." instance=ExtResource("7_6kqy7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.8991, 0, 0)
