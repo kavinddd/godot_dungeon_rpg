@@ -1,35 +1,29 @@
+
+using System;
 using DungeonRpg.Scripts.General;
 using Godot;
 
-public abstract partial class PlayerState : Node
+public abstract partial class PlayerState : CharacterState
 {
 
-	protected Player Player;
-	public override void _Ready()
-	{
-		Player = GetOwner<Player>();
-		SetPhysicsProcess(false);
-		SetProcessInput(false);
-	}
+    public override void _Ready()
+    {
+        base._Ready();
+        character.GetStatResource(Stat.Health).OnZero += HandleZeroHealth;
+    }
 
-	public override void _Notification(int what)
-	{
-		base._Notification(what);
-		if (what == GameConstants.NOTIFICATION_ENTER_STATE)
-		{
-			EnterState();
-			SetPhysicsProcess(true);
-			SetProcessInput(true);
-		}
+    protected void CheckForAttackInput()
+    {
+        if (Input.IsActionJustPressed(GameConstants.INPUT_ATTACK))
+        {
+            character.StateMachine.SwitchState<PlayerAttackState>();
+        }
+    }
 
-		if (what == GameConstants.NOTIFICATION_EXIT_STATE)
-		{
-			SetPhysicsProcess(false);
-			SetProcessInput(false);
-		}
-	}
-
-	protected virtual void EnterState() { }
-
+    private void HandleZeroHealth()
+    {
+        character.StateMachine.SwitchState<PlayerDeathState>();
+        GameEvents.RaiseEndGame();
+    }
 
 }

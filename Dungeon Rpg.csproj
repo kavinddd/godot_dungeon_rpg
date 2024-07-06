@@ -6,7 +6,4 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <RootNamespace>DungeonRpg</RootNamespace>
   </PropertyGroup>
-  <ItemGroup>
-    <Folder Include="Scenes\Characters\Player\" />
-  </ItemGroup>
 </Project>
