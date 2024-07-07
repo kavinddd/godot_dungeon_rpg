@@ -1,13 +1,14 @@
 
+using DungeonRpg.Scripts.General;
 using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 
 public partial class UIController : Control
 {
     private Dictionary<ContainerType, UIContainer> containers;
+    private bool canPause = false;
 
     public override void _Ready()
     {
@@ -18,13 +19,71 @@ public partial class UIController : Control
 
         containers[ContainerType.Start].Visible = true;
         containers[ContainerType.Start].Button.Pressed += HandleStartPressed;
+        containers[ContainerType.Pause].Button.Pressed += HandlePausePressed;
+        containers[ContainerType.Reward].Button.Pressed += HandleRewardPressed;
+
+        GameEvents.OnEndGame += HandleEndGame;
+        GameEvents.OnVictory += HandleVictory;
+        GameEvents.OnReward += HandleReward;
+    }
+
+    public override void _Input(InputEvent @event)
+    {
+        if (!canPause) return;
+        if (!Input.IsActionJustPressed(GameConstants.INPUT_PAUSE)) return;
+
+        containers[ContainerType.Stats].Visible = GetTree().Paused;
+        GetTree().Paused = !GetTree().Paused;
+        containers[ContainerType.Pause].Visible = GetTree().Paused;
+    }
+
+    private void HandleVictory()
+    {
+        canPause = false;
+        containers[ContainerType.Stats].Visible = false;
+        containers[ContainerType.Victory].Visible = true;
+        GetTree().Paused = true;
+    }
+
+    private void HandleEndGame()
+    {
+        canPause = false;
+        containers[ContainerType.Stats].Visible = false;
+        containers[ContainerType.Defeat].Visible = true;
     }
 
     private void HandleStartPressed()
     {
+        canPause = true;
         GetTree().Paused = false;
         containers[ContainerType.Start].Visible = false;
         containers[ContainerType.Stats].Visible = true;
         GameEvents.RaiseStartGame();
     }
+    private void HandlePausePressed()
+    {
+        GetTree().Paused = false;
+        containers[ContainerType.Pause].Visible = false;
+        containers[ContainerType.Stats].Visible = true;
+    }
+
+    private void HandleReward(RewardResource resource)
+    {
+        canPause = false;
+        GetTree().Paused = true;
+        containers[ContainerType.Stats].Visible = false;
+        containers[ContainerType.Reward].Visible = true;
+        containers[ContainerType.Reward].TextureRect.Texture = resource.SpriteTexture;
+        containers[ContainerType.Reward].Label.Text = resource.Description;
+    }
+
+
+    private void HandleRewardPressed()
+    {
+        canPause = true;
+        GetTree().Paused = false;
+        containers[ContainerType.Stats].Visible = true;
+        containers[ContainerType.Reward].Visible = false;
+    }
+
 }

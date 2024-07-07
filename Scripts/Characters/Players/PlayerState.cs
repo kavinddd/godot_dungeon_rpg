@@ -23,7 +23,6 @@ public abstract partial class PlayerState : CharacterState
     private void HandleZeroHealth()
     {
         character.StateMachine.SwitchState<PlayerDeathState>();
-        GameEvents.RaiseEndGame();
     }
 
 }

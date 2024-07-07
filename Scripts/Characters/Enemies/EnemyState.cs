@@ -13,7 +13,6 @@ public abstract partial class EnemyState : CharacterState
     }
 
 
-
     protected Vector3 GetPointGlobalPosition(int index)
     {
         Vector3 localPos = character.Path.Curve.GetPointPosition(index);

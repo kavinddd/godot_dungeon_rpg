@@ -1,10 +1,11 @@
-[gd_scene load_steps=121 format=3 uid="uid://b4mivwx5j3up4"]
+[gd_scene load_steps=125 format=3 uid="uid://b4mivwx5j3up4"]
 
 [ext_resource type="Script" path="res://Scripts/Characters/Enemies/Enemy.cs" id="1_otxgl"]
 [ext_resource type="Texture2D" uid="uid://mi2cpx7m2iwf" path="res://Assets/Sprites/Characters/Enemy Knight/Attack/0_Demons_of_Darkness_Slashing_011.png" id="1_pc355"]
 [ext_resource type="Texture2D" uid="uid://coislchf2nxob" path="res://Assets/Sprites/Characters/Enemy Knight/TakeHit/0_Demons_of_Darkness_Hurt_009.png" id="1_rl2rx"]
 [ext_resource type="Script" path="res://Scripts/Resources/StatResource.cs" id="2_1icux"]
 [ext_resource type="Texture2D" uid="uid://mu4lc4k8mlr5" path="res://Assets/Sprites/Characters/Enemy Knight/Idle/0_Demons_of_Darkness_Idle_000.png" id="2_05i8r"]
+[ext_resource type="Shader" path="res://Shaders/character_hurt.gdshader" id="3_1sflh"]
 [ext_resource type="Texture2D" uid="uid://u8fmewc65jog" path="res://Assets/Sprites/Characters/Enemy Knight/Idle/0_Demons_of_Darkness_Idle_001.png" id="3_q8y10"]
 [ext_resource type="Texture2D" uid="uid://jic8n7vxs1fr" path="res://Assets/Sprites/Characters/Enemy Knight/Idle/0_Demons_of_Darkness_Idle_002.png" id="4_urgtr"]
 [ext_resource type="Texture2D" uid="uid://x0ql3s7vj1y6" path="res://Assets/Sprites/Characters/Enemy Knight/Idle/0_Demons_of_Darkness_Idle_003.png" id="5_t684r"]
@@ -108,6 +109,8 @@
 [ext_resource type="Script" path="res://Scripts/Characters/Enemies/EnemyChaseState.cs" id="105_7ulw3"]
 [ext_resource type="Script" path="res://Scripts/Characters/Enemies/EnemyAttackState.cs" id="106_frpks"]
 [ext_resource type="Script" path="res://Scripts/Characters/Enemies/EnemyDeathState.cs" id="108_3jvcc"]
+[ext_resource type="Script" path="res://Scripts/Characters/AttackHitbox.cs" id="109_iio7e"]
+[ext_resource type="Script" path="res://Scripts/Characters/Enemies/EnemyStunState.cs" id="110_tbbq2"]
 
 [sub_resource type="Resource" id="Resource_da3hx"]
 script = ExtResource("2_1icux")
@@ -118,6 +121,14 @@ StatValue = 20.0
 script = ExtResource("2_1icux")
 StatType = 1
 StatValue = 4.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tomxa"]
+resource_local_to_scene = true
+render_priority = 1
+shader = ExtResource("3_1sflh")
+shader_parameter/active = false
+shader_parameter/flash_color = Color(1, 1, 1, 1)
+shader_parameter/tex = ExtResource("1_pc355")
 
 [sub_resource type="Animation" id="Animation_bbyo3"]
 resource_name = "Attack"
@@ -212,8 +223,7 @@ tracks/0/keys = {
 }
 
 [sub_resource type="Animation" id="Animation_dgf8b"]
-resource_name = "TakeHit"
-loop_mode = 1
+resource_name = "Stun"
 step = 0.0833333
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -234,7 +244,7 @@ _data = {
 "Death": SubResource("Animation_5824t"),
 "Idle": SubResource("Animation_cvc7g"),
 "Move": SubResource("Animation_ivehs"),
-"TakeHit": SubResource("Animation_dgf8b")
+"Stun": SubResource("Animation_dgf8b")
 }
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_a8h72"]
@@ -245,12 +255,12 @@ height = 1.37962
 radius = 6.0
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_3rom2"]
-radius = 1.4
+radius = 1.0
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_di8lg"]
 size = Vector3(0.5, 0.5, 0.5)
 
-[node name="Enemy" type="CharacterBody3D" node_paths=PackedStringArray("AnimPlayer", "Sprite3D", "StateMachine", "Hitbox", "HitboxShape", "Hurtbox", "NavAgent", "ChaseArea", "AttackArea")]
+[node name="Enemy" type="CharacterBody3D" node_paths=PackedStringArray("AnimPlayer", "Sprite3D", "StateMachine", "Hitbox", "HitboxShape", "Hurtbox", "IFrameTimer", "NavAgent", "ChaseArea", "AttackArea")]
 collision_layer = 4
 collision_mask = 3
 script = ExtResource("1_otxgl")
@@ -261,13 +271,16 @@ StateMachine = NodePath("StateMachine")
 Hitbox = NodePath("Hitbox")
 HitboxShape = NodePath("Hitbox/CollisionShape3D")
 Hurtbox = NodePath("Hurtbox")
+IFrameTimer = NodePath("IFrameTimer")
 NavAgent = NodePath("NavigationAgent3D")
 ChaseArea = NodePath("ChaseArea")
 AttackArea = NodePath("AttackArea")
 
 [node name="Sprite3D" type="Sprite3D" parent="."]
+material_overlay = SubResource("ShaderMaterial_tomxa")
 pixel_size = 0.0025
-texture = ExtResource("1_pc355")
+alpha_cut = 2
+texture = ExtResource("89_pfbfd")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
@@ -280,7 +293,7 @@ shape = SubResource("CapsuleShape3D_a8h72")
 
 [node name="StateMachine" parent="." node_paths=PackedStringArray("currentState", "states") instance=ExtResource("101_2g632")]
 currentState = NodePath("IdleState")
-states = [NodePath("IdleState"), NodePath("ReturnState"), NodePath("PatrolState"), NodePath("ChaseState"), NodePath("AttackState"), NodePath("DeathState")]
+states = [NodePath("IdleState"), NodePath("ReturnState"), NodePath("PatrolState"), NodePath("ChaseState"), NodePath("AttackState"), NodePath("DeathState"), NodePath("StunState")]
 
 [node name="IdleState" type="Node" parent="StateMachine"]
 script = ExtResource("102_43tlc")
@@ -309,6 +322,9 @@ script = ExtResource("106_frpks")
 [node name="DeathState" type="Node" parent="StateMachine"]
 script = ExtResource("108_3jvcc")
 
+[node name="StunState" type="Node" parent="StateMachine"]
+script = ExtResource("110_tbbq2")
+
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
 debug_enabled = true
 
@@ -336,6 +352,11 @@ shape = SubResource("CapsuleShape3D_a8h72")
 [node name="Hitbox" type="Area3D" parent="."]
 collision_layer = 4
 collision_mask = 0
+script = ExtResource("109_iio7e")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Hitbox"]
 shape = SubResource("BoxShape3D_di8lg")
+
+[node name="IFrameTimer" type="Timer" parent="."]
+wait_time = 0.25
+one_shot = true

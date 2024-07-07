@@ -5,12 +5,15 @@ using DungeonRpg.Scripts.General;
 public partial class PlayerDashState : PlayerState
 {
 	[Export] private Timer dashTimer;
+	[Export] private Timer cooldownTimer;
 	[Export] private float speed = 20;
+	[Export] private PackedScene bombScene;
 
 	public override void _Ready()
 	{
 		base._Ready();
 		dashTimer.Timeout += HandleDashTimeout;
+		CanTransition = () => cooldownTimer.IsStopped();
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -22,6 +25,7 @@ public partial class PlayerDashState : PlayerState
 
 	private void HandleDashTimeout()
 	{
+		cooldownTimer.Start();
 		character.Velocity = Vector3.Zero;
 		character.StateMachine.SwitchState<PlayerIdleState>();
 	}
@@ -39,7 +43,9 @@ public partial class PlayerDashState : PlayerState
 
 		character.Velocity *= speed;
 		dashTimer.Start();
-		base.EnterState();
+		Node3D bomb = bombScene.Instantiate<Node3D>();
+		GetTree().CurrentScene.AddChild(bomb);
+		bomb.GlobalPosition = character.GlobalPosition;
 	}
 }
 
